@@ -20,3 +20,7 @@ This was made to save time manualy assigning blendshapes to the Blendshape Avata
 
 
 [Ritual neo](https://www.youtube.com/ritualneo) was the one who requested this tools construction
+
+---
+##Notes
+Your input blendshapes must be named according to vrchat / arkit naming conventions
