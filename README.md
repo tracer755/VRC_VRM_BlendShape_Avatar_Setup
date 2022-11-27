@@ -4,11 +4,8 @@ This is mainly made for exporting for vseeface/arkit tracking
 
 This unity editor tool is made to auto setup a vrm Blendshape avatar with the blendshapes for:
 
-  Arkit face tracking
-  
-  Vrc visemes
-  
-  Blink
+* Arkit face tracking  
+* Vrc visemes  
   
 ---
 
