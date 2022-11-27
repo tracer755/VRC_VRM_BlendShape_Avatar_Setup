@@ -1,0 +1,1 @@
+# VRC_VRM_BlendShape_Avatar_Setup
