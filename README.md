@@ -9,10 +9,13 @@ This unity editor tool is made to auto setup a vrm Blendshape avatar with the bl
   
   Blink
   
-  ---
-  
-  Heres a sudo tutorial/demo might make a better one at some point
-  
-  https://youtu.be/qAckerv67Jc
-  
-  This was made to save time manualy assigning blendshapes to the Blendshape Avatar
+---
+
+Heres a sudo tutorial/demo might make a better one at some point
+
+https://youtu.be/qAckerv67Jc
+
+This was made to save time manualy assigning blendshapes to the Blendshape Avatar
+
+
+[Ritual neo](https://www.youtube.com/ritualneo) was the one who requested this tools construction
