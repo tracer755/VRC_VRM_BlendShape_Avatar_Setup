@@ -19,7 +19,7 @@ https://youtu.be/qAckerv67Jc
 This was made to save time manualy assigning blendshapes to the Blendshape Avatar
 
 
-[Ritual neo](https://www.youtube.com/ritualneo) was the one who requested this tools construction
+[Ritual neo](https://www.youtube.com/channel/UCaHuQWPtaw8XLRMIOctBQRQ) was the one who requested this tools construction
 
 ---
 ## Notes
