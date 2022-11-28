@@ -9,8 +9,8 @@ This unity editor tool is made to auto setup a vrm Blendshape avatar with the bl
   
 ---
 
-Heres a sudo tutorial/demo might make a better one at some point  
-https://youtu.be/qAckerv67Jc
+Heres a tutorial on how to use the tool 
+https://www.youtube.com/watch?v=6omhxjDSFdE
 
 <br />
 This was made to save time manualy assigning blendshapes to the Blendshape Avatar  
