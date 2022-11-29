@@ -6,6 +6,10 @@ This unity editor tool is made to auto setup a vrm Blendshape avatar with the bl
 
 * Arkit face tracking  
 * Vrc visemes  
+
+<br />
+
+[Download](https://github.com/tracer755/VRC_VRM_BlendShape_Avatar_Setup/releases)
   
 ---
 
