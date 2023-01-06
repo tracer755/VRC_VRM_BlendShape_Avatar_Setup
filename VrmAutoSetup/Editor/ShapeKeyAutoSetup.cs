@@ -37,7 +37,6 @@ public class ShapeKeyAutoSetup : EditorWindow
             other_lowwer = Array.ConvertAll(Other_BlendShapes, d => d.ToLower());
         }
 
-
         EditorGUILayout.LabelField("Auto setup vrm blendshapes", EditorStyles.boldLabel);
         EditorGUILayout.LabelField("\n\n", EditorStyles.whiteLabel);
         SaveLocation = EditorGUILayout.TextField("Save Location", SaveLocation);
@@ -49,16 +48,14 @@ public class ShapeKeyAutoSetup : EditorWindow
 
         EditorGUILayout.LabelField("\n\n", EditorStyles.whiteLabel);
         name = EditorGUILayout.TextField("Avatar Name", name);
-        //EditorGUILayout.LabelField("\n", EditorStyles.boldLabel);
 
-        //i hate that i have to wrap this in a try catch so unity dosent spaz when you open the object selector
         try
         {
             Avatar = EditorGUILayout.ObjectField("Avatar prefab", Avatar, typeof(GameObject), true) as GameObject;
         }
         catch (UnityEngine.ExitGUIException)
         {
-            //throw;
+            //Here so unity dosn't freak out
         }
         catch (System.Exception e)
         {
@@ -68,7 +65,6 @@ public class ShapeKeyAutoSetup : EditorWindow
         EditorGUILayout.LabelField("\n\n", EditorStyles.boldLabel);
 
         bool buttonEnabled = true;
-
         string tempBtnMsg = "";
 
         if (SaveLocation == "")
@@ -110,7 +106,6 @@ public class ShapeKeyAutoSetup : EditorWindow
 
             var skinned_mesh = Avatar.GetComponent<SkinnedMeshRenderer>();
             var shared_mesh = skinned_mesh.sharedMesh;
-
             List<string> BlendShape = new List<string>();
 
             if (!Directory.Exists(SaveLocation + @"/Clips"))
@@ -123,12 +118,13 @@ public class ShapeKeyAutoSetup : EditorWindow
             {
                 string shape = shared_mesh.GetBlendShapeName(i).Trim().ToLower();
                 int index = Array.IndexOf(arkit_lowwer, shape);
+                
                 //look for arkit face tracking
                 if (index != -1)
                 {
                     if (Array.IndexOf(BlendShape.ToArray(), arkit_BlendShapes[index]) != -1)
                     {
-                        Debug.Log($"VRM Blendshape {BlendShape[Array.IndexOf(BlendShape.ToArray(), arkit_BlendShapes[index])]} has multiple valid blendshapes, Avatar Blendshape {arkit_BlendShapes[index]} will not be used for this VRM shape");
+                        Debug.Log($"Avatar Blendshape {BlendShape[Array.IndexOf(BlendShape.ToArray(), arkit_BlendShapes[index])]} has multiple valid blendshapes, Avatar Blendshape {arkit_BlendShapes[index]} will not be used for this VRM shape");
                     }
                     else
                     {
@@ -138,7 +134,6 @@ public class ShapeKeyAutoSetup : EditorWindow
                         Clip.BlendShapeName = arkit_BlendShapes[index];
                         var Data = new VRM.BlendShapeBinding();
                         Data.Weight = 100;
-                        //Data.RelativePath = "Body";
                         Data.RelativePath = Avatar.name;
                         Data.Index = i;
                         var array = new VRM.BlendShapeBinding[1];
@@ -165,7 +160,6 @@ public class ShapeKeyAutoSetup : EditorWindow
                             Clip.BlendShapeName = Other_BlendShapes_Names[index2];
                             var Data = new VRM.BlendShapeBinding();
                             Data.Weight = 100;
-                            //Data.RelativePath = "Body";
                             Data.RelativePath = Avatar.name;
                             Data.Index = i;
                             var array = new VRM.BlendShapeBinding[1];
@@ -200,11 +194,6 @@ public class ShapeKeyAutoSetup : EditorWindow
             foreach (var obj in BlendShape)
             {
                 string[] lines = System.IO.File.ReadAllLines(SaveLocation + @"/Clips/" + obj + ".asset.meta");
-                /*if (id == 0)
-                {
-                    id = Convert.ToInt64(lines[4].Split(':')[1].Trim());
-                }*/
-
                 if (latch)
                 {
                     TmpData += "  - {fileID:" + Convert.ToInt64(lines[4].Split(':')[1].Trim()) + ", guid: " + lines[1].Split(' ')[1].Trim() + ", type: 2}";
@@ -215,13 +204,11 @@ public class ShapeKeyAutoSetup : EditorWindow
                 }
                 latch = false;
             }
-
             TmpData = TmpData.Replace("  Clips: []", "  Clips:");
 
             StreamWriter streamWriter = new StreamWriter(path3);
             streamWriter.Write(TmpData);
             streamWriter.Close();
-
             AssetDatabase.Refresh();
             Debug.Log($"Sucessfully created: {BlendShape.Count} vrm keys for avatar: {name}");
         }
@@ -232,7 +219,6 @@ public class ShapeKeyAutoSetup : EditorWindow
             {
                 var skinned_mesh = Avatar.GetComponent<SkinnedMeshRenderer>();
                 var shared_mesh = skinned_mesh.sharedMesh;
-
                 int count = 0;
                 string tmpMsg = "";
                 bool latch = true;
@@ -255,7 +241,6 @@ public class ShapeKeyAutoSetup : EditorWindow
 
                     latch = false;
                 }
-
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(200));
                 GUILayout.Label($"{shared_mesh.blendShapeCount} BlendShapes detected on avatar \n{count} are valid VRM shapes\n\n" + tmpMsg);
                 EditorGUILayout.EndScrollView();
@@ -273,7 +258,6 @@ public class ShapeKeyAutoSetup : EditorWindow
             GUILayout.Label("No selected avatar");
             EditorGUILayout.EndScrollView();
         }
-
         GUILayout.Label("\n");
         if (GUILayout.Button("Tutorial"))
         {
