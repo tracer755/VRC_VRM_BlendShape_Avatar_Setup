@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands.BranchExplorer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ public class ShapeKeyAutoSetup : EditorWindow
     string avatarName = "";
     Vector2 scrollPos;
     int blendShapeCount = 0;
+    float progress = 0f;
 
     string[] arkit_lowwer = new string[0];
     string[] other_lowwer = new string[0];
@@ -43,7 +45,6 @@ public class ShapeKeyAutoSetup : EditorWindow
         if (GUILayout.Button("Set Save Location"))
         {
             SaveLocation = EditorUtility.OpenFolderPanel("Save Folder", "", "");
-            AssetDatabase.Refresh();
         }
         EditorGUILayout.LabelField("\n\n", EditorStyles.whiteLabel);
         avatarName = EditorGUILayout.TextField("Avatar Name", avatarName);
@@ -59,7 +60,6 @@ public class ShapeKeyAutoSetup : EditorWindow
         {
             throw (e);
         }
-
         EditorGUILayout.LabelField("\n\n", EditorStyles.boldLabel);
         bool buttonEnabled = true;
         string tempBtnMsg = "";
@@ -102,21 +102,33 @@ public class ShapeKeyAutoSetup : EditorWindow
         GUI.enabled = true;
         if (setupBtn)
         {
+            progress = 0f;
+            EditorUtility.DisplayProgressBar("Auto generate vrm", "Starting", progress);    
             var skinned_mesh = Avatar.GetComponent<SkinnedMeshRenderer>();
             var shared_mesh = skinned_mesh.sharedMesh;
             List<string> BlendShape = new List<string>();
-
-            if (!Directory.Exists(SaveLocation + @"/Clips"))
+            if (!Directory.Exists(SaveLocation + $@"/{avatarName}_Clips"))
             {
-                Directory.CreateDirectory(SaveLocation + @"/Clips");
+                Directory.CreateDirectory(SaveLocation + $@"/{avatarName}_Clips");
             }
-
+            else
+            {
+                Directory.Delete(SaveLocation + $@"/{avatarName}_Clips", true);
+                Directory.CreateDirectory(SaveLocation + $@"/{avatarName}_Clips");
+            }
+            //check for a avatar file that already exitsts
+            if (File.Exists(Directory.GetCurrentDirectory() + @"/" + "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset"))
+            {
+                File.Delete(Directory.GetCurrentDirectory() + @"/" + "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset");
+                File.Delete(Directory.GetCurrentDirectory() + @"/" + "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset.meta");
+            }
+            AssetDatabase.Refresh();
             //Generate Clips
+            float tempProgValue = (float)(.8 / blendShapeCount);
             for (int i = 0; i < shared_mesh.blendShapeCount; i++)
             {
                 string shape = shared_mesh.GetBlendShapeName(i).Trim().ToLower();
                 int index = Array.IndexOf(arkit_lowwer, shape);
-
                 //look for arkit face tracking
                 if (index != -1)
                 {
@@ -126,9 +138,11 @@ public class ShapeKeyAutoSetup : EditorWindow
                     }
                     else
                     {
+                        progress += tempProgValue;
+                        EditorUtility.DisplayProgressBar("Auto generate vrm", $"Generating {arkit_BlendShapes[index]} shape", progress);
                         BlendShape.Add(arkit_BlendShapes[index]);
                         var Clip = ScriptableObject.CreateInstance<BlendShapeClip>();
-                        string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + @"/Clips/" + arkit_BlendShapes[index] + ".asset";
+                        string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + arkit_BlendShapes[index] + ".asset";
                         Clip.BlendShapeName = arkit_BlendShapes[index];
                         var Data = new VRM.BlendShapeBinding();
                         Data.Weight = 100;
@@ -152,9 +166,11 @@ public class ShapeKeyAutoSetup : EditorWindow
                         }
                         else
                         {
+                            progress += tempProgValue;
+                            EditorUtility.DisplayProgressBar("Auto generate vrm", $"Generating {Other_BlendShapes_Names[index2]} shape", progress);
                             BlendShape.Add(Other_BlendShapes_Names[index2]);
                             var Clip = ScriptableObject.CreateInstance<BlendShapeClip>();
-                            string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + @"/Clips/" + Other_BlendShapes_Names[index2] + ".asset";
+                            string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + Other_BlendShapes_Names[index2] + ".asset";
                             Clip.BlendShapeName = Other_BlendShapes_Names[index2];
                             var Data = new VRM.BlendShapeBinding();
                             Data.Weight = 100;
@@ -172,24 +188,25 @@ public class ShapeKeyAutoSetup : EditorWindow
             var AvatarData = ScriptableObject.CreateInstance<BlendShapeAvatar>();
             AssetDatabase.CreateAsset(AvatarData, "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset");
             BlendShape.Sort();
-
             //generate a neutral clip
+            EditorUtility.DisplayProgressBar("Auto generate vrm", $"Generating neural shape", progress += tempProgValue);
             BlendShape.Insert(0, "Neutral");
             var Clip2 = ScriptableObject.CreateInstance<BlendShapeClip>();
             Clip2.BlendShapeName = "Neutral";
-            AssetDatabase.CreateAsset(Clip2, "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + @"/Clips/" + "Neutral" + ".asset");
+            AssetDatabase.CreateAsset(Clip2, "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + "Neutral" + ".asset");
             AssetDatabase.Refresh();
-
             //Add clips to a Blend Shape Avatar
+            EditorUtility.DisplayProgressBar("Auto generate vrm", $"Adding shapes to VRM avatar file", .9f);
             List<string> guids = new List<string>();
             string path3 = SaveLocation + @"/" + avatarName + "_AvatarBlendShape.asset";
             StreamReader sr = new StreamReader(path3);
             string TmpData = sr.ReadToEnd();
             sr.Close();
             bool latch = true;
+            TmpData = TmpData.Replace("  Clips: []", "  Clips:");
             foreach (var obj in BlendShape)
             {
-                string[] lines = System.IO.File.ReadAllLines(SaveLocation + @"/Clips/" + obj + ".asset.meta");
+                string[] lines = System.IO.File.ReadAllLines(SaveLocation + $@"/{avatarName}_Clips/" + obj + ".asset.meta");
                 if (latch)
                 {
                     TmpData += "  - {fileID:" + Convert.ToInt64(lines[4].Split(':')[1].Trim()) + ", guid: " + lines[1].Split(' ')[1].Trim() + ", type: 2}";
@@ -200,13 +217,14 @@ public class ShapeKeyAutoSetup : EditorWindow
                 }
                 latch = false;
             }
-            TmpData = TmpData.Replace("  Clips: []", "  Clips:");
+            EditorUtility.DisplayProgressBar("Auto generate vrm", $"Finishing up", 1f);
             StreamWriter streamWriter = new StreamWriter(path3);
             streamWriter.Write(TmpData);
             streamWriter.Close();
             AssetDatabase.Refresh();
             Debug.Log($"Sucessfully created: {BlendShape.Count} vrm keys for avatar: {avatarName}");
             EditorGUIUtility.PingObject(AvatarData);
+            EditorUtility.ClearProgressBar();
         }
 
         if (Avatar != null)
@@ -257,7 +275,6 @@ public class ShapeKeyAutoSetup : EditorWindow
             EditorGUILayout.EndScrollView();
             blendShapeCount = 0;
         }
-        GUILayout.Label("\n");
         if (GUILayout.Button("Tutorial"))
         {
             Application.OpenURL("https://www.youtube.com/watch?v=6omhxjDSFdE");
