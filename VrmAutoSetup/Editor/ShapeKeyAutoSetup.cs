@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -11,8 +11,9 @@ public class ShapeKeyAutoSetup : EditorWindow
 
     GameObject Avatar = null;
     string SaveLocation = "";
-    string name = "";
+    string avatarName = "";
     Vector2 scrollPos;
+    int blendShapeCount = 0;
 
     string[] arkit_lowwer = new string[0];
     string[] other_lowwer = new string[0];
@@ -29,14 +30,13 @@ public class ShapeKeyAutoSetup : EditorWindow
     }
 
 
-    private async void OnGUI()
+    private void OnGUI()
     {
         if (arkit_BlendShapes.Length == 0 || other_lowwer.Length == 0)
         {
             arkit_lowwer = Array.ConvertAll(arkit_BlendShapes, d => d.ToLower());
             other_lowwer = Array.ConvertAll(Other_BlendShapes, d => d.ToLower());
         }
-
         EditorGUILayout.LabelField("Auto setup vrm blendshapes", EditorStyles.boldLabel);
         EditorGUILayout.LabelField("\n\n", EditorStyles.whiteLabel);
         SaveLocation = EditorGUILayout.TextField("Save Location", SaveLocation);
@@ -45,10 +45,8 @@ public class ShapeKeyAutoSetup : EditorWindow
             SaveLocation = EditorUtility.OpenFolderPanel("Save Folder", "", "");
             AssetDatabase.Refresh();
         }
-
         EditorGUILayout.LabelField("\n\n", EditorStyles.whiteLabel);
-        name = EditorGUILayout.TextField("Avatar Name", name);
-
+        avatarName = EditorGUILayout.TextField("Avatar Name", avatarName);
         try
         {
             Avatar = EditorGUILayout.ObjectField("Avatar prefab", Avatar, typeof(GameObject), true) as GameObject;
@@ -63,7 +61,6 @@ public class ShapeKeyAutoSetup : EditorWindow
         }
 
         EditorGUILayout.LabelField("\n\n", EditorStyles.boldLabel);
-
         bool buttonEnabled = true;
         string tempBtnMsg = "";
 
@@ -84,7 +81,7 @@ public class ShapeKeyAutoSetup : EditorWindow
                 tempBtnMsg += "\nSave location must be in your projects assets folder";
             }
         }
-        if (name == "")
+        if (avatarName == "")
         {
             tempBtnMsg += "\nPlease give the avatar a name";
             buttonEnabled = false;
@@ -94,16 +91,17 @@ public class ShapeKeyAutoSetup : EditorWindow
             tempBtnMsg += "\nPlease input an avatar";
             buttonEnabled = false;
         }
-
+        if(blendShapeCount == 0 && Avatar != null)
+        {
+            tempBtnMsg += "\nThere are no valid blendshapes on this avatar";
+            buttonEnabled = false;
+        }
         GUILayout.Label(tempBtnMsg.Trim());
         GUI.enabled = buttonEnabled;
-        var goBtn = GUILayout.Button("Setup Data!");
-
+        var setupBtn = GUILayout.Button("Setup Data!");
         GUI.enabled = true;
-        if (goBtn)
+        if (setupBtn)
         {
-            Debug.Log("Starting vrm setup");
-
             var skinned_mesh = Avatar.GetComponent<SkinnedMeshRenderer>();
             var shared_mesh = skinned_mesh.sharedMesh;
             List<string> BlendShape = new List<string>();
@@ -118,7 +116,7 @@ public class ShapeKeyAutoSetup : EditorWindow
             {
                 string shape = shared_mesh.GetBlendShapeName(i).Trim().ToLower();
                 int index = Array.IndexOf(arkit_lowwer, shape);
-                
+
                 //look for arkit face tracking
                 if (index != -1)
                 {
@@ -172,8 +170,7 @@ public class ShapeKeyAutoSetup : EditorWindow
             }
             //generate the avatar blendshape file before the assetdatabase refresh
             var AvatarData = ScriptableObject.CreateInstance<BlendShapeAvatar>();
-            AssetDatabase.CreateAsset(AvatarData, "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + name + "_AvatarBlendShape.asset");
-            Debug.Log("Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + name + "_AvatarBlendShape.asset");
+            AssetDatabase.CreateAsset(AvatarData, "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset");
             BlendShape.Sort();
 
             //generate a neutral clip
@@ -185,8 +182,7 @@ public class ShapeKeyAutoSetup : EditorWindow
 
             //Add clips to a Blend Shape Avatar
             List<string> guids = new List<string>();
-            //long id = 0;
-            string path3 = SaveLocation + @"/" + name + "_AvatarBlendShape.asset";
+            string path3 = SaveLocation + @"/" + avatarName + "_AvatarBlendShape.asset";
             StreamReader sr = new StreamReader(path3);
             string TmpData = sr.ReadToEnd();
             sr.Close();
@@ -205,12 +201,12 @@ public class ShapeKeyAutoSetup : EditorWindow
                 latch = false;
             }
             TmpData = TmpData.Replace("  Clips: []", "  Clips:");
-
             StreamWriter streamWriter = new StreamWriter(path3);
             streamWriter.Write(TmpData);
             streamWriter.Close();
             AssetDatabase.Refresh();
-            Debug.Log($"Sucessfully created: {BlendShape.Count} vrm keys for avatar: {name}");
+            Debug.Log($"Sucessfully created: {BlendShape.Count} vrm keys for avatar: {avatarName}");
+            EditorGUIUtility.PingObject(AvatarData);
         }
 
         if (Avatar != null)
@@ -244,12 +240,14 @@ public class ShapeKeyAutoSetup : EditorWindow
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(200));
                 GUILayout.Label($"{shared_mesh.blendShapeCount} BlendShapes detected on avatar \n{count} are valid VRM shapes\n\n" + tmpMsg);
                 EditorGUILayout.EndScrollView();
+                blendShapeCount = count;
             }
             catch
             {
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(200));
                 GUILayout.Label("No valid blend shapes detected on current avatar");
                 EditorGUILayout.EndScrollView();
+                blendShapeCount = 0;
             }
         }
         else
@@ -257,6 +255,7 @@ public class ShapeKeyAutoSetup : EditorWindow
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(200));
             GUILayout.Label("No selected avatar");
             EditorGUILayout.EndScrollView();
+            blendShapeCount = 0;
         }
         GUILayout.Label("\n");
         if (GUILayout.Button("Tutorial"))
@@ -266,7 +265,6 @@ public class ShapeKeyAutoSetup : EditorWindow
         this.Repaint();
     }
 }
-
 public class ClipValue
 {
     public string RelativePath = "Body";
