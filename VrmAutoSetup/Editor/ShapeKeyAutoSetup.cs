@@ -16,7 +16,6 @@ public class ShapeKeyAutoSetup : EditorWindow
     Vector2 scrollPos;
     int blendShapeCount = 0;
     float progress = 0f;
-
     string[] arkit_lowwer = new string[0];
     string[] other_lowwer = new string[0];
 
@@ -30,7 +29,6 @@ public class ShapeKeyAutoSetup : EditorWindow
     {
         GetWindow(typeof(ShapeKeyAutoSetup));
     }
-
 
     private void OnGUI()
     {
