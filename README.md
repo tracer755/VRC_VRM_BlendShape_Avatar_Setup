@@ -26,3 +26,4 @@ This tool is not a silver bullet and has some edge cases that the tool will not 
 * Your input blendshapes must be named according to vrchat / arkit naming conventions
 * If the tool fails to make the file delete the files the tool generated and try again
 * Please verify your avatar. Some avatars have weird/unconventional names for blendshapes
+* For extra visemes Vseeface requires all extra visemes to be present [SIL, CH, DD, FF, KK, NN, PP, RR, SS, TH]
