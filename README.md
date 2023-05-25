@@ -1,4 +1,4 @@
-## Vrchat avatar VRM auto setup
+## VRM auto setup
 
 This is mainly made for exporting for vseeface/arkit tracking
 
