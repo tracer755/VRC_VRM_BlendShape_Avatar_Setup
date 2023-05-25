@@ -1,5 +1,4 @@
-using Codice.Client.BaseCommands.BranchExplorer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -23,7 +22,7 @@ public class ShapeKeyAutoSetup : EditorWindow
     string[] arkit_BlendShapes = new string[] { "BrowDownLeft", "BrowDownRight", "BrowInnerUp", "BrowOuterUpLeft", "BrowOuterUpRight", "CheekPuff", "CheekSquintLeft", "CheekSquintRight", "EyeBlinkLeft", "EyeBlinkRight", "EyeLookDownLeft", "EyeLookDownRight", "EyeLookInLeft", "EyeLookInRight", "EyeLookOutLeft", "EyeLookOutRight", "EyeLookUpLeft", "EyeLookUpRight", "EyeSquintLeft", "EyeSquintRight", "EyeWideLeft", "EyeWideRight", "JawForward", "JawLeft", "JawOpen", "JawRight", "MouthClose", "MouthDimpleLeft", "MouthDimpleRight", "MouthFrownLeft", "MouthFrownRight", "MouthFunnel", "MouthLeft", "MouthLowerDownLeft", "MouthLowerDownRight", "MouthPressLeft", "MouthPressRight", "MouthPucker", "MouthRight", "MouthRollLower", "MouthRollUpper", "MouthShrugLower", "MouthShrugUpper", "MouthSmileLeft", "MouthSmileRight", "MouthStretchLeft", "MouthStretchRight", "MouthUpperUpLeft", "MouthUpperUpRight", "NoseSneerLeft", "NoseSneerRight", "TongueOut" };
     string[] Other_BlendShapes = new string[] { "v_aa", "v_e", "v_ee", "v_ih", "v_oh", "v_ou", "v_sil", "v_ch", "v_dd", "v_ff", "v_kk", "v_nn", "v_pp", "v_rr", "v_ss", "v_th", "LeftBlink", "RightBlink", "Blink", "vrc.v_aa", "vrc.v_e", "vrc.v_ee", "vrc.v_ih", "vrc.v_oh", "vrc.v_ou", "vrc.v_sil", "vrc.v_ch", "vrc.v_dd", "vrc.v_ff", "vrc.v_kk", "vrc.v_nn", "vrc.v_pp", "vrc.v_rr", "vrc.v_ss", "vrc.v_th", "aa", "e", "ee", "ih", "oh", "ou", "sil", "ch", "dd", "ff", "kk", "nn", "pp", "rr", "ss", "th" };
     string[] Other_BlendShapes_Names = new string[] { "A", "E", "E", "I", "O", "U", "SIL", "CH", "DD", "FF", "KK", "NN", "PP", "RR", "SS", "TH", "Blink_L", "Blink_R", "Blink", "A", "E", "E", "I", "O", "U", "SIL", "CH", "DD", "FF", "KK", "NN", "PP", "RR", "SS", "TH", "A", "E", "E", "I", "O", "U", "SIL", "CH", "DD", "FF", "KK", "NN", "PP", "RR", "SS", "TH" };
-
+    NamePreset[] NamePresets = new NamePreset[] { new NamePreset { name="A", blendShapePreset=BlendShapePreset.A}, new NamePreset { name = "E", blendShapePreset = BlendShapePreset.E }, new NamePreset { name = "I", blendShapePreset = BlendShapePreset.I }, new NamePreset { name = "O", blendShapePreset = BlendShapePreset.O }, new NamePreset { name = "U", blendShapePreset = BlendShapePreset.U }, new NamePreset { name = "Blink", blendShapePreset = BlendShapePreset.Blink }, new NamePreset { name = "Blink_R", blendShapePreset = BlendShapePreset.Blink_R }, new NamePreset { name = "Blink_L", blendShapePreset = BlendShapePreset.Blink_L } };
     [MenuItem("Tools/Vrm/Auto setup shapekeys")]
     public static void ShowWindow()
     {
@@ -89,7 +88,7 @@ public class ShapeKeyAutoSetup : EditorWindow
             tempBtnMsg += "\nPlease input an avatar";
             buttonEnabled = false;
         }
-        if(blendShapeCount == 0 && Avatar != null)
+        if (blendShapeCount == 0 && Avatar != null)
         {
             tempBtnMsg += "\nThere are no valid blendshapes on this avatar";
             buttonEnabled = false;
@@ -101,7 +100,7 @@ public class ShapeKeyAutoSetup : EditorWindow
         if (setupBtn)
         {
             progress = 0f;
-            EditorUtility.DisplayProgressBar("Auto generate vrm", "Starting", progress);    
+            EditorUtility.DisplayProgressBar("Auto generate vrm", "Starting", progress);
             var skinned_mesh = Avatar.GetComponent<SkinnedMeshRenderer>();
             var shared_mesh = skinned_mesh.sharedMesh;
             List<string> BlendShape = new List<string>();
@@ -140,6 +139,13 @@ public class ShapeKeyAutoSetup : EditorWindow
                         EditorUtility.DisplayProgressBar("Auto generate vrm", $"Generating {arkit_BlendShapes[index]} shape", progress);
                         BlendShape.Add(arkit_BlendShapes[index]);
                         var Clip = ScriptableObject.CreateInstance<BlendShapeClip>();
+                        foreach(NamePreset obj in NamePresets)
+                        {
+                            if(obj.name == arkit_BlendShapes[index])
+                            {
+                                Clip.Preset = obj.blendShapePreset;
+                            }
+                        }
                         string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + arkit_BlendShapes[index] + ".asset";
                         Clip.BlendShapeName = arkit_BlendShapes[index];
                         var Data = new VRM.BlendShapeBinding();
@@ -168,6 +174,13 @@ public class ShapeKeyAutoSetup : EditorWindow
                             EditorUtility.DisplayProgressBar("Auto generate vrm", $"Generating {Other_BlendShapes_Names[index2]} shape", progress);
                             BlendShape.Add(Other_BlendShapes_Names[index2]);
                             var Clip = ScriptableObject.CreateInstance<BlendShapeClip>();
+                            foreach (NamePreset obj in NamePresets)
+                            {
+                                if (obj.name == Other_BlendShapes_Names[index2])
+                                {
+                                    Clip.Preset = obj.blendShapePreset;
+                                }
+                            }
                             string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + Other_BlendShapes_Names[index2] + ".asset";
                             Clip.BlendShapeName = Other_BlendShapes_Names[index2];
                             var Data = new VRM.BlendShapeBinding();
@@ -190,6 +203,7 @@ public class ShapeKeyAutoSetup : EditorWindow
             EditorUtility.DisplayProgressBar("Auto generate vrm", $"Generating neural shape", progress += tempProgValue);
             BlendShape.Insert(0, "Neutral");
             var Clip2 = ScriptableObject.CreateInstance<BlendShapeClip>();
+            Clip2.Preset = BlendShapePreset.Neutral;
             Clip2.BlendShapeName = "Neutral";
             AssetDatabase.CreateAsset(Clip2, "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + "Neutral" + ".asset");
             AssetDatabase.Refresh();
@@ -285,4 +299,9 @@ public class ClipValue
     public string RelativePath = "Body";
     public int Index;
     public float Weight;
+}
+class NamePreset
+{
+    public string name;
+    public BlendShapePreset blendShapePreset;
 }
