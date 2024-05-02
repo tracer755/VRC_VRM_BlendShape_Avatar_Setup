@@ -1,10 +1,11 @@
 ## VRM auto setup
 
-This is mainly made for exporting for vseeface/arkit tracking (Unified Expressions Comming soon)
+This is mainly made for exporting for vseeface/arkit tracking/Unified Expressions
 
 This unity editor tool is made to auto setup a vrm Blendshape avatar with the blendshapes for:
 
-* Arkit face tracking  
+* Arkit face tracking
+* Unified Expressions
 * Vrc visemes  
 
 
