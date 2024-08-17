@@ -1,12 +1,13 @@
 ## VRM auto setup
 
-This is mainly made for exporting for vseeface/arkit tracking/Unified Expressions
+This is mainly made for exporting for vseeface/ARkit tracking/Unified Expressions
 
 This unity editor tool is made to auto setup a vrm Blendshape avatar with the blendshapes for:
 
 * Arkit face tracking
 * Unified Expressions
-* Vrc visemes  
+* Vrc visemes
+* UE to ARkit convertion BETA
 
 
 ### [Download](https://github.com/tracer755/VRC_VRM_BlendShape_Avatar_Setup/releases)
@@ -24,7 +25,7 @@ This tool is not a silver bullet and has some edge cases that the tool will not 
 
 ---
 ## Notes
-* Your input blendshapes must be named according to vrchat / arkit naming conventions
-* If the tool fails to make the file delete the files the tool generated and try again
+* Your input blendshapes must be named according to vrchat / arkit / UE naming conventions (Not case sensetive)
 * Please verify your avatar. Some avatars have weird/unconventional names for blendshapes
 * For extra visemes Vseeface requires all extra visemes to be present [SIL, CH, DD, FF, KK, NN, PP, RR, SS, TH]
+* UE to ARkit convertion is currently a BETA feature and may need user tweaking to get everything looking just right
