@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 using VRM;
 
 public class ShapeKeyAutoSetup : EditorWindow
@@ -21,7 +19,7 @@ public class ShapeKeyAutoSetup : EditorWindow
     string[] Unified_lowwer = new string[0];
     string[] other_lowwer = new string[0];
     int selectedMode = 0;
-    string[] modeNames = new string[] {"ARKit", "Unified Expressions"};
+    string[] modeNames = new string[] {"ARKit", "Unified Expressions", "Unified To ARkit (Beta)"};
     string relativePath = "";
 
     //these are the blendshapes that the tool looks for
@@ -30,6 +28,8 @@ public class ShapeKeyAutoSetup : EditorWindow
     string[] Other_BlendShapes_Names = new string[] { "A", "E", "E", "I", "O", "U", "SIL", "CH", "DD", "FF", "KK", "NN", "PP", "RR", "SS", "TH", "Blink_L", "Blink_R", "Blink", "A", "E", "E", "I", "O", "U", "SIL", "CH", "DD", "FF", "KK", "NN", "PP", "RR", "SS", "TH", "A", "E", "E", "I", "O", "U", "SIL", "CH", "DD", "FF", "KK", "NN", "PP", "RR", "SS", "TH" };
     string[] Unified_BlendShapes = new string[] { "EyeLookOutRight", "EyeLookInRight", "EyeLookUpRight", "EyeLookDownRight", "EyeLookOutLeft", "EyeLookInLeft", "EyeLookUpLeft", "EyeLookDownLeft", "EyeClosedRight", "EyeClosedLeft", "EyeSquintRight", "EyeSquintLeft", "EyeWideRight", "EyeWideLeft", "EyeDilationRight", "EyeDilationLeft", "EyeConstrictRight", "EyeConstrictLeft", "BrowPinchRight", "BrowPinchLeft", "BrowLowererRight", "BrowLowererLeft", "BrowInnerUpRight", "BrowInnerUpLeft", "BrowOuterUpRight", "BrowOuterUpLeft", "NoseSneerRight", "NoseSneerLeft", "NasalDilationRight", "NasalDilationLeft", "NasalConstrictRight", "NasalConstrictLeft", "CheekSquintRight", "CheekSquintLeft", "CheekPuffRight", "CheekPuffLeft", "CheekSuckRight", "CheekSuckLeft", "JawOpen", "MouthClosed", "JawRight", "JawLeft", "JawForward", "JawBackward", "JawClench", "JawMandibleRaise", "LipSuckUpperRight", "LipSuckUpperLeft", "LipSuckLowerRight", "LipSuckLowerLeft", "LipSuckCornerRight", "LipSuckCornerLeft", "LipFunnelUpperRight", "LipFunnelUpperLeft", "LipFunnelLowerRight", "LipFunnelLowerLeft", "LipPuckerUpperRight", "LipPuckerUpperLeft", "LipPuckerLowerRight", "LipPuckerLowerLeft", "MouthUpperUpRight", "MouthUpperUpLeft", "MouthLowerDownRight", "MouthLowerDownLeft", "MouthUpperDeepenRight", "MouthUpperDeepenLeft", "MouthUpperRight", "MouthUpperLeft", "MouthLowerRight", "MouthLowerLeft", "MouthCornerPullRight", "MouthCornerPullLeft", "MouthCornerSlantRight", "MouthCornerSlantLeft", "MouthFrownRight", "MouthFrownLeft", "MouthStretchRight", "MouthStretchLeft", "MouthDimpleRight", "MouthDimpleLeft", "MouthRaiserUpper", "MouthRaiserLower", "MouthPressRight", "MouthPressLeft", "MouthTightenerRight", "MouthTightenerLeft", "TongueOut", "TongueUp", "TongueDown", "TongueRight", "TongueLeft", "TongueRoll", "TongueBendDown", "TongueCurlUp", "TongueSquish", "TongueFlat", "TongueTwistRight", "TongueTwistLeft", "SoftPalateClose", "ThroatSwallow", "NeckFlexRight", "NeckFlexLeft", "EyeClosed", "EyeWide", "EyeSquint", "EyeDilation", "EyeConstrict", "BrowDownRight", "BrowDownLeft", "BrowDown", "BrowUpRight", "BrowUpLeft", "BrowUp", "NoseSneer", "NasalDilation", "NasalConstrict", "CheekPuff", "CheekSuck", "CheekSquint", "LipSuckUpper", "LipSuckLower", "LipSuck", "LipFunnelUpper", "LipFunnelLower", "LipFunnel", "LipPuckerUpper", "LipPuckerLower", "LipPucker", "MouthUpperUp", "MouthLowerDown", "MouthOpen", "MouthRight", "MouthLeft", "MouthSmileRight", "MouthSmileLeft", "MouthSmile", "MouthSadRight", "MouthSadLeft", "MouthSad", "MouthStretch", "MouthDimple", "MouthTightener", "MouthPress" };
     NamePreset[] NamePresets = new NamePreset[] { new NamePreset { name="A", blendShapePreset=BlendShapePreset.A}, new NamePreset { name = "E", blendShapePreset = BlendShapePreset.E }, new NamePreset { name = "I", blendShapePreset = BlendShapePreset.I }, new NamePreset { name = "O", blendShapePreset = BlendShapePreset.O }, new NamePreset { name = "U", blendShapePreset = BlendShapePreset.U }, new NamePreset { name = "Blink", blendShapePreset = BlendShapePreset.Blink }, new NamePreset { name = "Blink_R", blendShapePreset = BlendShapePreset.Blink_R }, new NamePreset { name = "Blink_L", blendShapePreset = BlendShapePreset.Blink_L } };
+    UEToArkitProxy[] UEproxyList = new UEToArkitProxy[] { new UEToArkitProxy { arkitname = "eyeLookUpRight", UEnames = { "EyeLookUpRight" } }, new UEToArkitProxy { arkitname = "eyeLookDownRight", UEnames = { "EyeLookDownRight" } }, new UEToArkitProxy { arkitname = "eyeLookInRight", UEnames = { "EyeLookInRight" } }, new UEToArkitProxy { arkitname = "eyeLookOutRight", UEnames = { "EyeLookOutRight" } }, new UEToArkitProxy { arkitname = "eyeLookUpLeft", UEnames = { "EyeLookUpLeft" } }, new UEToArkitProxy { arkitname = "eyeLookDownLeft", UEnames = { "EyeLookDownLeft" } }, new UEToArkitProxy { arkitname = "eyeLookInLeft", UEnames = { "EyeLookInLeft" } }, new UEToArkitProxy { arkitname = "eyeLookOutLeft", UEnames = { "EyeLookOutLeft" } }, new UEToArkitProxy { arkitname = "eyeBlinkRight", UEnames = { "EyeClosedRight" } }, new UEToArkitProxy { arkitname = "eyeBlinkLeft", UEnames = { "EyeClosedLeft" } }, new UEToArkitProxy { arkitname = "eyeSquintRight", UEnames = { "EyeSquintRight" } }, new UEToArkitProxy { arkitname = "eyeSquintLeft", UEnames = { "EyeSquintLeft" } }, new UEToArkitProxy { arkitname = "eyeWideRight", UEnames = { "EyeWideRight" } }, new UEToArkitProxy { arkitname = "eyeWideLeft", UEnames = { "EyeWideLeft" } }, new UEToArkitProxy { arkitname = "browDownRight", UEnames = { "BrowPinchRight", "BrowLowererRight" } }, new UEToArkitProxy { arkitname = "browDownLeft", UEnames = { "BrowPinchLeft", "BrowLowererLeft" } }, new UEToArkitProxy { arkitname = "browInnerUp", UEnames = { "BrowInnerUpRight", "BrowInnerUpLeft" } }, new UEToArkitProxy { arkitname = "browOuterUpRight", UEnames = { "BrowOuterUpRight" } }, new UEToArkitProxy { arkitname = "browOuterUpLeft", UEnames = { "BrowOuterUpLeft" } }, new UEToArkitProxy { arkitname = "noseSneerRight", UEnames = { "NoseSneerRight" } }, new UEToArkitProxy { arkitname = "noseSneerLeft", UEnames = { "NoseSneerLeft" } }, new UEToArkitProxy { arkitname = "cheekSquintRight", UEnames = { "CheekSquintRight" } }, new UEToArkitProxy { arkitname = "cheekSquintLeft", UEnames = { "CheekSquintLeft" } }, new UEToArkitProxy { arkitname = "cheekPuff", UEnames = { "CheekPuffRight", "CheekPuffLeft" } }, new UEToArkitProxy { arkitname = "jawOpen", UEnames = { "JawOpen" } }, new UEToArkitProxy { arkitname = "mouthClose", UEnames = { "MouthClosed" } }, new UEToArkitProxy { arkitname = "jawRight", UEnames = { "JawRight" } }, new UEToArkitProxy { arkitname = "jawLeft", UEnames = { "JawLeft" } }, new UEToArkitProxy { arkitname = "jawForward", UEnames = { "JawForward" } }, new UEToArkitProxy { arkitname = "mouthRollUpper", UEnames = { "LipSuckUpperRight", "LipSuckUpperLeft" } }, new UEToArkitProxy { arkitname = "mouthRollLower", UEnames = { "LipSuckLowerRight", "LipSuckLowerLeft" } }, new UEToArkitProxy { arkitname = "mouthFunnel", UEnames = { "LipFunnelUpperRight", "LipFunnelUpperLeft", "LipFunnelLowerRight", "LipFunnelLowerLeft" } }, new UEToArkitProxy { arkitname = "mouthPucker", UEnames = { "LipPuckerUpperRight", "LipPuckerUpperLeft", "LipPuckerLowerRight", "LipPuckerLowerLeft" } }, new UEToArkitProxy { arkitname = "mouthUpperUpRight", UEnames = { "MouthUpperUpRight" } }, new UEToArkitProxy { arkitname = "mouthUpperUpLeft", UEnames = { "MouthUpperUpLeft" } }, new UEToArkitProxy { arkitname = "mouthLowerDownRight", UEnames = { "MouthLowerDownRight" } }, new UEToArkitProxy { arkitname = "mouthLowerDownLeft", UEnames = { "MouthLowerDownLeft" } }, new UEToArkitProxy { arkitname = "mouthSmileRight", UEnames = { "MouthCornerPullRight", "MouthCornerSlantRight" } }, new UEToArkitProxy { arkitname = "mouthSmileLeft", UEnames = { "MouthCornerPullLeft", "MouthCornerSlantLeft" } }, new UEToArkitProxy { arkitname = "mouthFrownRight", UEnames = { "MouthFrownRight" } }, new UEToArkitProxy { arkitname = "mouthFrownLeft", UEnames = { "MouthFrownLeft" } }, new UEToArkitProxy { arkitname = "mouthStretchRight", UEnames = { "MouthStretchRight" } }, new UEToArkitProxy { arkitname = "mouthStretchLeft", UEnames = { "MouthStretchLeft" } }, new UEToArkitProxy { arkitname = "mouthDimpleRight", UEnames = { "MouthDimpleRight" } }, new UEToArkitProxy { arkitname = "mouthDimpleLeft", UEnames = { "MouthDimpleLeft" } }, new UEToArkitProxy { arkitname = "mouthShrugUpper", UEnames = { "MouthRaiserUpper" } }, new UEToArkitProxy { arkitname = "mouthShrugLower", UEnames = { "MouthRaiserLower" } }, new UEToArkitProxy { arkitname = "mouthPressRight", UEnames = { "MouthPressRight" } }, new UEToArkitProxy { arkitname = "mouthPressLeft", UEnames = { "MouthPressLeft" } }, new UEToArkitProxy { arkitname = "tongueOut", UEnames = { "TongueOut" } }};
+
     [MenuItem("Tools/Vrm/Auto setup shapekeys")]
     
     public static void ShowWindow()
@@ -97,7 +97,7 @@ public class ShapeKeyAutoSetup : EditorWindow
             tempBtnMsg += "\nPlease input an avatar";
             buttonEnabled = false;
         }
-        if (blendShapeCount == 0 && Avatar != null)
+        if (blendShapeCount == 0 && Avatar != null && selectedMode != 2)
         {
             tempBtnMsg += "\nThere are no valid blendshapes on this avatar";
             buttonEnabled = false;
@@ -436,6 +436,162 @@ public class ShapeKeyAutoSetup : EditorWindow
             EditorGUIUtility.PingObject(AvatarData);
             EditorUtility.ClearProgressBar();
         }
+        if (setupBtn && selectedMode == 2)
+        {
+            progress = 0f;
+            EditorUtility.DisplayProgressBar("Auto generate vrm | UE to ARkit", "Starting", progress);
+            var skinned_mesh = Avatar.GetComponent<SkinnedMeshRenderer>();
+            var shared_mesh = skinned_mesh.sharedMesh;
+            List<string> BlendShape = new List<string>();
+            if (!Directory.Exists(SaveLocation + $@"/{avatarName}_Clips"))
+            {
+                Directory.CreateDirectory(SaveLocation + $@"/{avatarName}_Clips");
+            }
+            else
+            {
+                Directory.Delete(SaveLocation + $@"/{avatarName}_Clips", true);
+                Directory.CreateDirectory(SaveLocation + $@"/{avatarName}_Clips");
+            }
+            //check for a avatar file that already exitsts
+            if (File.Exists(Directory.GetCurrentDirectory() + @"/" + "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset"))
+            {
+                File.Delete(Directory.GetCurrentDirectory() + @"/" + "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset");
+                File.Delete(Directory.GetCurrentDirectory() + @"/" + "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset.meta");
+            }
+            AssetDatabase.Refresh();
+
+            List<String> AvatarShapes = new List<String>();
+            for (int i = 0; i < shared_mesh.blendShapeCount; i++)
+            {
+                AvatarShapes.Add(shared_mesh.GetBlendShapeName(i).Trim().ToLower());
+            }
+            foreach (var item in UEproxyList)
+            {
+                //try to find all of the sub items
+                bool foundSubItems = true;
+                foreach(var subShape in item.UEnames)
+                {
+                    if(AvatarShapes.IndexOf(subShape.ToLower()) == -1)
+                    {
+                        foundSubItems = false;
+                        Debug.Log("Could not find some of: " + item.arkitname + " shapes specificaly the: " + subShape + " UE shape");
+                    }
+                }
+                if (foundSubItems)
+                {
+                    //create the shapes
+                    var Clip = ScriptableObject.CreateInstance<BlendShapeClip>();
+                    string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + item.arkitname + ".asset";
+                    Clip.BlendShapeName = item.arkitname;
+                    var array = new VRM.BlendShapeBinding[1];
+                    List<VRM.BlendShapeBinding> shapes = new List<VRM.BlendShapeBinding>();
+
+                    foreach(var subShape in item.UEnames)
+                    {
+                        var Data = new VRM.BlendShapeBinding();
+                        Data.Weight = 100;
+                        if (relativePath == "")
+                        {
+                            Data.RelativePath = Avatar.name;
+                        }
+                        else
+                        {
+                            Data.RelativePath = relativePath;
+                        }
+                        Data.Index = AvatarShapes.IndexOf(subShape.ToLower());
+                        shapes.Add(Data);
+                    }
+                    Clip.Values = shapes.ToArray();
+                    AssetDatabase.CreateAsset(Clip, path);
+                    BlendShape.Add(item.arkitname);
+                }
+            }
+            for (int i = 0; i < shared_mesh.blendShapeCount; i++)
+            {
+                string shape = shared_mesh.GetBlendShapeName(i).Trim().ToLower();
+                int index = Array.IndexOf(Unified_lowwer, shape);
+                Debug.LogWarning(shape + " - " + index);
+        
+                int index2 = Array.IndexOf(other_lowwer, shape);
+
+                if (index2 != -1)
+                {
+                    if (Array.IndexOf(BlendShape.ToArray(), Other_BlendShapes_Names[index2]) != -1)
+                    {
+                        Debug.Log($"VRM Blendshape {BlendShape[Array.IndexOf(BlendShape.ToArray(), Other_BlendShapes_Names[index2])]} has multiple valid blendshapes, Avatar Blendshape {Other_BlendShapes_Names[index2]} will not be used for this VRM shape");
+                    }
+                    else
+                    {
+                        BlendShape.Add(Other_BlendShapes_Names[index2]);
+                        var Clip = ScriptableObject.CreateInstance<BlendShapeClip>();
+                        foreach (NamePreset obj in NamePresets)
+                        {
+                            if (obj.name == Other_BlendShapes_Names[index2])
+                            {
+                                Clip.Preset = obj.blendShapePreset;
+                            }
+                        }
+                        string path = "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + Other_BlendShapes_Names[index2] + ".asset";
+                        Clip.BlendShapeName = Other_BlendShapes_Names[index2];
+                        var Data = new VRM.BlendShapeBinding();
+                        Data.Weight = 100;
+                        if (relativePath == "")
+                        {
+                            Data.RelativePath = Avatar.name;
+                        }
+                        else
+                        {
+                            Data.RelativePath = relativePath;
+                        }
+                        Data.Index = i;
+                        var array = new VRM.BlendShapeBinding[1];
+                        array[0] = Data;
+                        Clip.Values = array;
+                        AssetDatabase.CreateAsset(Clip, path);
+                    }
+                }
+            }
+            var AvatarData = ScriptableObject.CreateInstance<BlendShapeAvatar>();
+            AssetDatabase.CreateAsset(AvatarData, "Assets" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + "/" + avatarName + "_AvatarBlendShape.asset");
+            BlendShape.Sort();
+
+            var Clip2 = ScriptableObject.CreateInstance<BlendShapeClip>();
+            Clip2.Preset = BlendShapePreset.Neutral;
+            Clip2.BlendShapeName = "Neutral";
+            AssetDatabase.CreateAsset(Clip2, "Assets/" + SaveLocation.Split(new[] { "Assets" }, StringSplitOptions.None)[1] + $@"/{avatarName}_Clips/" + "Neutral" + ".asset");
+            AssetDatabase.Refresh();
+            BlendShape.Insert(0, "Neutral");
+
+            EditorUtility.DisplayProgressBar("Auto generate vrm", $"Adding shapes to VRM avatar file", .9f);
+            List<string> guids = new List<string>();
+            string path3 = SaveLocation + @"/" + avatarName + "_AvatarBlendShape.asset";
+            StreamReader sr = new StreamReader(path3);
+            string TmpData = sr.ReadToEnd();
+            sr.Close();
+            bool latch = true;
+            TmpData = TmpData.Replace("  Clips: []", "  Clips:");
+            foreach (var obj in BlendShape)
+            {
+                string[] lines = System.IO.File.ReadAllLines(SaveLocation + $@"/{avatarName}_Clips/" + obj + ".asset.meta");
+                if (latch)
+                {
+                    TmpData += "  - {fileID:" + Convert.ToInt64(lines[4].Split(':')[1].Trim()) + ", guid: " + lines[1].Split(' ')[1].Trim() + ", type: 2}";
+                }
+                else
+                {
+                    TmpData += "\n  - {fileID:" + Convert.ToInt64(lines[4].Split(':')[1].Trim()) + ", guid: " + lines[1].Split(' ')[1].Trim() + ", type: 2}";
+                }
+                latch = false;
+            }
+            EditorUtility.DisplayProgressBar("Auto generate vrm", $"Finishing up", 1f);
+            StreamWriter streamWriter = new StreamWriter(path3);
+            streamWriter.Write(TmpData);
+            streamWriter.Close();
+            AssetDatabase.Refresh();
+            Debug.Log($"Sucessfully created: {BlendShape.Count} vrm keys for avatar: {avatarName}");
+            EditorGUIUtility.PingObject(AvatarData);
+            EditorUtility.ClearProgressBar();
+        }
 
         if (Avatar != null)
         {
@@ -467,7 +623,7 @@ public class ShapeKeyAutoSetup : EditorWindow
                         latch = false;
                     }
                 }
-                else if(selectedMode == 1)
+                else if (selectedMode == 1)
                 {
                     for (int i = 0; i < shared_mesh.blendShapeCount; i++)
                     {
@@ -488,8 +644,58 @@ public class ShapeKeyAutoSetup : EditorWindow
                         latch = false;
                     }
                 }
+                else if (selectedMode == 2)
+                {
+                    string missingShapes = "";
+                    List<String> AvatarShapes = new List<String>();
+                    for (int i = 0; i < shared_mesh.blendShapeCount; i++)
+                    {
+                        AvatarShapes.Add(shared_mesh.GetBlendShapeName(i).Trim().ToLower());
+                    }
+                    foreach (var item in UEproxyList)
+                    {
+                        //try to find all of the sub items
+                        bool foundSubItems = true;
+                        string missingsubshapes = "";
+                        foreach (var subShape in item.UEnames)
+                        {
+                            if (AvatarShapes.IndexOf(subShape.ToLower()) == -1)
+                            {
+                                foundSubItems = false;
+                                missingsubshapes += "-- " + subShape + "\n";
+                            }
+                        }
+                        if (foundSubItems)
+                        {
+                            count++;
+                            if (latch)
+                            {
+                                tmpMsg += item.arkitname;
+                            }
+                            else
+                            {
+                                tmpMsg += "\n" + item.arkitname;
+                            }
+                            latch = false;
+                        }
+                        else
+                        {
+                            missingShapes += item.arkitname + "\n";
+                            missingShapes += missingsubshapes;
+                        }
+                    }
+                    tmpMsg += "\n \n Missing Shapes \n" + missingShapes;
+                }
+
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(200));
-                GUILayout.Label($"{shared_mesh.blendShapeCount} BlendShapes detected on avatar \n{count} are valid VRM shapes\n\n" + tmpMsg);
+                if (selectedMode == 0 || selectedMode == 1)
+                {
+                    GUILayout.Label($"{shared_mesh.blendShapeCount} BlendShapes detected on avatar \n{count} are valid VRM shapes\n\n" + tmpMsg);
+                }
+                else if (selectedMode == 2)
+                {
+                    GUILayout.Label($"{shared_mesh.blendShapeCount} BlendShapes detected on avatar \n{count} are valid blended VRM shapes\n\n" + tmpMsg);
+                }
                 EditorGUILayout.EndScrollView();
                 blendShapeCount = count;
             }
@@ -528,4 +734,10 @@ class NamePreset
 {
     public string name;
     public BlendShapePreset blendShapePreset;
+}
+
+class UEToArkitProxy
+{
+    public string arkitname;
+    public List<string> UEnames = new List<string>();
 }
